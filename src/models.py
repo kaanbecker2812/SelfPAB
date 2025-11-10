@@ -1468,7 +1468,6 @@ def get_pred_head(
 
 
 from pytorch_lightning.loggers import LightningLoggerBase
-from pytorch_lightning.loggers.base import rank_zero_experiment
 from pytorch_lightning.utilities import rank_zero_only
 
 class MetricsHistoryLogger(LightningLoggerBase):
