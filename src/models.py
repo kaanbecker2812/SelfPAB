@@ -1,3 +1,11 @@
+import warnings
+warnings.filterwarnings(
+    "ignore",
+    message="pkg_resources is deprecated as an API.*",
+    category=UserWarning,
+    module="torchmetrics.utilities.imports",
+)
+
 import sys
 import math
 import einops
@@ -934,6 +942,7 @@ class UpstreamModel(pl.LightningModule):
         self.activation = {}
         self.do_weighted_sum = weighted_sum_layer is not None
         model_cls = get_model_class(algorithm_name)
+        print(f'Loading upstream model from {model_path}')
         cp_model = model_cls.load_from_checkpoint(
             model_path
         )
@@ -1467,10 +1476,10 @@ def get_pred_head(
 
 
 
-from pytorch_lightning.loggers import LightningLoggerBase
+from pytorch_lightning.loggers.logger import Logger
 from pytorch_lightning.utilities import rank_zero_only
 
-class MetricsHistoryLogger(LightningLoggerBase):
+class MetricsHistoryLogger(Logger):
     def __init__(self):
         super().__init__()
         self.history = collections.defaultdict(list)

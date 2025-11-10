@@ -1,3 +1,11 @@
+import warnings
+warnings.filterwarnings(
+    "ignore",
+    message="pkg_resources is deprecated as an API.*",
+    category=UserWarning,
+    module="torchmetrics.utilities.imports",
+)
+
 import os
 import cmat
 import argparse
@@ -185,9 +193,9 @@ def train(config, ds_path=None, loso=False):
                     )
                 )
             trainer = pl.Trainer(
-                gpus=config.NUM_GPUS,
+                accelerator='gpu' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu',
+                devices=config.NUM_GPUS if torch.cuda.is_available() else 1 if torch.backends.mps.is_available() else None,
                 logger=loggers,
-                checkpoint_callback=False,
                 max_epochs=args['epochs'],
                 log_every_n_steps=5,
                 check_val_every_n_epoch=check_val_every_n_epoch,
