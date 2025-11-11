@@ -69,11 +69,11 @@ def train(config, ds_path=None, loso=False):
     best_logs = None
     # Iterate over all dataset configs if given
     for ds_args in src.utils.grid_search(config.DATASET_ARGS):
-        print(f'Dataset arguments: {ds_args}', flush=True)
+        #print(f'Dataset arguments: {ds_args}', flush=True)
         # Iterate over all model configs if given
         for args in src.utils.grid_search(config.ALGORITHM_ARGS):
             ######### Train with given args ##########
-            print(f'Evaluating arguments: {args}', flush=True)
+            #print(f'Evaluating arguments: {args}', flush=True)
             if config.SKIP_FINISHED_ARGS and \
                src.utils.args_exist(args, ds_args, cmat_path):
                 print(f'Skipping existing args {current_iter}...')
@@ -118,7 +118,7 @@ def train(config, ds_path=None, loso=False):
                     valid_mode=True,
                     name_label_map=config.class_name_label_map
                 )
-                if valid_subjects is not None: print(f'Valid subjects: {valid_subjects}')
+                #if valid_subjects is not None: print(f'Valid subjects: {valid_subjects}')
             # Create the dataloaders
             collate_fn = dataset.collate_fn if hasattr(dataset, 'collate_fn') else None
             # Subsample train if needed:

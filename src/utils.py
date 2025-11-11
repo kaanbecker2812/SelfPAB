@@ -56,7 +56,9 @@ def cv_split(data, folds, randomize=0, split_p=None):
         raise ValueError(f'More folds than subjects provided {folds} > {len(data)}')
     # Do leave-one-out if fold is zero or a negative number
     if folds <= 0:
-        folds = len(data)
+        #folds = len(data)
+        subj = [x.split('_')[2] for x in data]
+        folds = len(set(subj))
     # Make a list of subjects and do a seeded shuffle if configured
     subjects = list(data)
     if randomize > 0:
@@ -68,8 +70,10 @@ def cv_split(data, folds, randomize=0, split_p=None):
     else:
         # In case only 1 fold required it is splitted according to split_p
         step = int(np.ceil(len(data) * split_p))
+    
     for fold in range(folds):
-        valid = subjects[fold * step:(fold + 1) * step]
+        valid = [sub for sub in subjects if sub.split('_')[2] == f'{fold + 1}']
+        #valid = subjects[fold * step:(fold + 1) * step]
         train = [s for s in subjects if not s in valid]
         yield fold, train, valid
 

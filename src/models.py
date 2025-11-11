@@ -5,6 +5,12 @@ warnings.filterwarnings(
     category=UserWarning,
     module="torchmetrics.utilities.imports",
 )
+"""warnings.filterwarnings(
+    "ignore",
+    message="You are using `torch.load` with `weights_only=False`.*",
+    category=FutureWarning,
+    module="lightning_lite.utilities.cloud_io",
+)"""
 
 import sys
 import math
@@ -1145,10 +1151,10 @@ class ActivationList:
         self.fct_list = []
         for activation_name in fct_name_list:
             if activation_name == 'softmax':
-                print('Softmax output activation')
+                #print('Softmax output activation')
                 self.fct_list.append(torch.nn.functional.softmax)
             elif activation_name is None or activation_name=='identity':
-                print('No output activation')
+                #print('No output activation')
                 def identity(x, *args, **kwargs):
                     return x
                 self.fct_list.append(identity)

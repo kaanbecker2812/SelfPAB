@@ -67,8 +67,8 @@ def loso_cv(config, dataset_path=None, hopt=False):
         else:
             config.VALID_SPLIT = valid_split
         config.TEST_SUBJECTS = test_files
-        print(f'Test subject: {test_files}')
-        print(f'Train subjects: {train_files}')
+        print(f'Test subject: {test_files[0].split("_")[2]}')
+        #print(f'Train subjects: {train_files}')
         _,test_cmat,best_logs,best_args = train.train(config,dataset_path,loso=True)
         if config.WANDB:
             for test_filename in test_cmat.keys():

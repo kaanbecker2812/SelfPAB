@@ -180,7 +180,7 @@ class HARDataset(torch.utils.data.Dataset):
     def _label_cols_available(self):
         '''Is there a y_column in every given root file'''
         filenames = [x for x in os.listdir(self.root_path) \
-                     if x not in self.skip_files]
+                     if x not in self.skip_files and x.endswith('.csv')]
         for fn in tqdm(filenames):
             available_cols = pd.read_csv(
                 os.path.join(self.root_path, fn),
@@ -843,11 +843,30 @@ class STFTDataset(HARDataset):
             t_dict = src.utils.argmax(t_dict, axis=-1)  # Get classes for preds
         return t_dict
 
+    @staticmethod
+    def cut_force_peaks(df, force_peak_label=9, active_labels=[1,2,3]):
+        if force_peak_label not in df['labels'].values:
+            return df
+        force_peaks = df.index[df['labels'] == force_peak_label].to_list()
+        active_indices = df.index[df['labels'].isin(active_labels)].to_list()
+        if not active_indices:
+            df['labels'] = 0
+            return df
+        first_active, last_active = active_indices[0], active_indices[-1]
+        # cut peaks outside active range
+        peaks_before = [p for p in force_peaks if p < first_active]
+        peaks_after = [p for p in force_peaks if p > last_active]
+
+        cut_start = max(peaks_before) + 1 if peaks_before else 0
+        cut_end = min(peaks_after) if peaks_after else len(df)
+
+        return df.iloc[cut_start:cut_end].reset_index(drop=True)
+
     def read_all(self, root_path):
         """ Reads all csv files in a given path and computes STFT"""
         data = {}
         filenames = [x for x in os.listdir(root_path) \
-                     if x not in self.skip_files]
+                     if x not in self.skip_files and x.endswith('.csv')]
         uc = self.x_columns+[self.y_column]
         if self.return_timestamps:
             uc = [self.timestamp_column] + uc
@@ -864,6 +883,7 @@ class STFTDataset(HARDataset):
             for drop_label in self.drop_labels:
                 df = df[df[self.y_column]!=drop_label]
             df = df.dropna()  # Drop nan values
+            df = self.cut_force_peaks(df)
             # Required for classification
             if self._label_cols_available:
                 df[self.y_column] = self.replace_classes(df[self.y_column])
