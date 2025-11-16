@@ -38,13 +38,13 @@ def loso_cv(config, dataset_path=None, hopt=False):
     valid_split = 'test' if config.FOLDS==0 else config.VALID_SPLIT
     print('valid_split=',valid_split)
     if config.WANDB:
-        ds_name = os.path.realpath(dataset_path).split('/')[-1]
-        proj_name = 'harth_plus_dl_LOSO_'+config.PROJ_NAME+ds_name
+        #ds_name = os.path.realpath(dataset_path).split('/')[-1]
+        proj_name = 'EASE_'+config.PROJ_NAME
         run_name = config.ALGORITHM+'_'+config.DATASET
         src.utils.wandb_init(
             run_name=run_name,
             wandb_config=vars(config),
-            entity='hunt4-har',
+            entity='kaan-becker-technical-univeryity-munich',
             proj_name=proj_name,
             key=config.WANDB_KEY
         )
@@ -67,8 +67,8 @@ def loso_cv(config, dataset_path=None, hopt=False):
         else:
             config.VALID_SPLIT = valid_split
         config.TEST_SUBJECTS = test_files
-        print(f'Test subject: {test_files[0].split("_")[2]}')
-        #print(f'Train subjects: {train_files}')
+        print(f'No. of train subjects: {len(train_files)}')
+        print(f'Test subject: {test_files[0].split("_")[2]}; No. of test subjects: {len(test_files)}')
         _,test_cmat,best_logs,best_args = train.train(config,dataset_path,loso=True)
         if config.WANDB:
             for test_filename in test_cmat.keys():

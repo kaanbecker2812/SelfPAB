@@ -151,13 +151,13 @@ def train(config, ds_path=None, loso=False):
             )
             _epochs = args['epochs']
             total_step_count = len(train_dl)*_epochs
-            val_after_nth_step = args['val_after_nth_step'] if 'val_after_nth_step' in args else 100
+            """val_after_nth_step = args['val_after_nth_step'] if 'val_after_nth_step' in args else 100
             val_check_interval = val_after_nth_step/len(train_dl)
             if val_check_interval <= 1:
                 check_val_every_n_epoch = 1
             else:
                 check_val_every_n_epoch = int(val_check_interval)
-                val_check_interval = 1.0
+                val_check_interval = 1.0"""
             args.update({'input_dim': dataset.feature_dim,
                          'output_dim': dataset.output_shapes,
                          'total_step_count': total_step_count,
@@ -193,13 +193,16 @@ def train(config, ds_path=None, loso=False):
                     )
                 )
             trainer = pl.Trainer(
+                #gpus=config.NUM_GPUS,
+                #checkpoint_callback=False,
                 accelerator='gpu' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu',
                 devices=config.NUM_GPUS if torch.cuda.is_available() else 1 if torch.backends.mps.is_available() else None,
                 logger=loggers,
                 max_epochs=args['epochs'],
-                log_every_n_steps=5,
-                check_val_every_n_epoch=check_val_every_n_epoch,
-                val_check_interval=val_check_interval,
+                #log_every_n_steps=5,
+                #enable_progress_bar=False,
+                #check_val_every_n_epoch=check_val_every_n_epoch,
+                val_check_interval=0.5,
                 callbacks=callbacks
             )
             trainer.fit(model, train_dl, valid_dl)

@@ -49,7 +49,7 @@ def get_dataset(
     name_label_map=None
 ):
     allowed_datasets = ['TimeSeries', 'STFT', 'HUNT4Masked',
-                        'USCHAD', 'PAMAP2', 'MobiAct']
+                        'USCHAD', 'PAMAP2', 'MobiAct', 'EASE']
     if dataset_name in allowed_datasets:
         cls = getattr(
             sys.modules[__name__],
@@ -920,6 +920,7 @@ class STFTDataset(HARDataset):
                     pad=[0,overflow],
                     value=self.padding_val
                 )
+            x = meter_per_sec_squared2g(x)
             x = torch.stft(
                 input=x,
                 n_fft=self.n_fft,
@@ -1938,6 +1939,84 @@ class HARBaseDataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return self._size
+
+class EASEDataset(HARBaseDataset):
+    def __init__(
+        self, args, root_dir,
+        num_classes,
+        config_path='',
+        label_map=None,
+        valid_mode=False,
+        test_mode=False,
+        inference_mode=False,
+        skip_files=[],
+        **kwargs
+        # x_columns, y_column,
+    ):
+        '''Dataset class for loading the PAMAP dataset properly.
+
+        Parameters
+        ----------
+        root_dir (string): Directory of training data
+
+        '''
+        self.drop_labels = []  # Ignore 0 label
+        super().__init__(
+            args=args,
+            root_dir=root_dir,
+            num_classes=num_classes,
+            config_path=config_path,
+            label_map=label_map,
+            valid_mode=valid_mode,
+            test_mode=test_mode,
+            inference_mode=inference_mode,
+            skip_files=skip_files
+        )
+
+    def read_all(self, root_path):
+        """ Reads all dat files and computes STFT of the PAMAP2 dataset"""
+        data = {}
+        filenames = [x for x in os.listdir(root_path) \
+                     if x not in self.skip_files and x.endswith('.csv')]
+        uc = self.x_columns+[self.y_column] + ['Time']  # include timestamp here
+        for fn in tqdm(filenames):
+            data[fn] = []
+            df = pd.read_csv(
+                os.path.join(root_path, fn),
+                usecols=uc,
+            )
+            for drop_label in self.drop_labels:
+                df = df[df[self.y_column]!=drop_label]
+            df = df.dropna()  # Drop nan values
+            # Required for classification
+            if self.label_map is not None:
+                df[self.y_column] = df[self.y_column].apply(
+                    lambda _x: self.label_map[_x]
+                )
+            # Resampling if required
+            if self.source_freq != self.target_freq:
+                df = self.resample(df, discrete_columns=['Time', self.y_column])
+            # activity split of csshar-tfa
+            _df = df[['Time', self.y_column]]
+            min_df_label = _df.groupby((_df[self.y_column] != _df[self.y_column].shift()).cumsum()).min()
+            max_df_label = _df.groupby((_df[self.y_column] != _df[self.y_column].shift()).cumsum()).max()
+            labels_summary = pd.concat([min_df_label, max_df_label], axis=1)
+            labels_summary.columns = ['start_timestep', 'label_to_drop', 'end_timestep', 'label']
+            labels_summary = labels_summary.drop('label_to_drop', axis=1).reset_index(drop=True)
+            for _, row in labels_summary.iterrows():
+                dff = df.loc[df[df['Time']==row.start_timestep].index[0]:df[df['Time']==row.end_timestep].index[0]]
+                dff = dff.drop('Time', axis=1)
+                x = torch.tensor(dff[self.x_columns].values,dtype=torch.float32)
+                # Dataset is in m/s^2, transform into g:
+                x = meter_per_sec_squared2g(x)
+                if self.apply_stft: x = self.stft(x)
+                lbl = int(row.label)
+                lbl = torch.tensor([lbl]*x.shape[0],
+                                   dtype=torch.int64)
+                for _x, _y in self.segment_xy(x=x, y=lbl):
+                    data[fn].append([_x, _y])
+                #data[fn].append([x, lbl])
+        return data
 
 
 class PAMAP2Dataset(HARBaseDataset):
