@@ -71,24 +71,23 @@ def loso_cv(config, dataset_path=None, hopt=False):
         print(f'Test subject: {test_files[0].split("_")[2]}; No. of test subjects: {len(test_files)}')
         _,test_cmat,best_logs,best_args = train.train(config,dataset_path,loso=True)
         if config.WANDB:
-            for test_filename in test_cmat.keys():
-                src.utils.log_cmat_metrics_to_wandb(
-                    log_cmat=test_cmat[test_filename],
-                    log_name=test_filename,
-                    class_names=config.class_names,
-                    metrics=['average_f1score',
-                             'average_recall',
-                             'average_precision',
-                             'accuracy',
-                             'cmat',
-                            ]
-                )
-                src.utils.log_history_metrics_to_wandb(
+            #for test_filename in test_cmat.keys():
+            src.utils.log_cmat_metrics_to_wandb(
+                log_cmat=test_cmat,#[test_filename],
+                log_name= f'Fold_{test_files[0].split("_")[2]}', #test_filename,
+                class_names=config.class_names,
+                metrics=['average_f1score',
+                            'average_recall',
+                            'average_precision',
+                            'accuracy',
+                            'cmat',
+                        ])
+            src.utils.log_history_metrics_to_wandb(
                     metrics_dict=best_logs,
                     log_name=test_filename,
                 )
-                all_test_true += list(test_cmat[test_filename].y_true)
-                all_test_pred += list(test_cmat[test_filename].y_pred)
+            all_test_true += list(test_cmat.y_true)#[test_filename].y_true)
+            all_test_pred += list(test_cmat.y_pred)#[test_filename].y_pred)
         fold_performances.append(np.mean([getattr(_c, config.EVAL_METRIC) for _c in test_cmat.values()]))
         if config.STORE_CMATS:
             to_store_path = f'{config.CONFIG_PATH}/loso_cmats/' if config.FOLDS==0 \

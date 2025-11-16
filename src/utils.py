@@ -284,6 +284,9 @@ def log_wandb_cmat(
 
     '''
     cmat_name = 'cmat_' + log_name
+
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
     wandb.log({cmat_name: wandb.plot.confusion_matrix(
                     probs=None,
                     y_true=y_true, preds=y_pred,

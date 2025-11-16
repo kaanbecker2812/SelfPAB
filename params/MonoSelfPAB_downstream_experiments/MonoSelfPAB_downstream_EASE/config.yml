@@ -23,16 +23,16 @@ FOLDS: 0
 
 NUM_WORKERS: 8  # Num of workers for data loading
 NUM_GPUS: []  # How many GPUs to use
-WANDB: False
+WANDB: True
 WANDB_KEY: '6e4c1240ab75e6cd5108325b3f17d887be6ebfa9'
 PROJ_NAME: 'MonoSelfPAB_downstream'
 
 DATASET: STFT
 DATASET_ARGS:
-  x_columns: [[Sig_IMU_Back_Acc_x, Sig_IMU_Back_Acc_y, Sig_IMU_Back_Acc_z], 
+  x_columns: [[Sig_IMU_Back_Acc_x, Sig_IMU_Back_Acc_y, Sig_IMU_Back_Acc_z],
               [Sig_IMU_RU_Acc_x, Sig_IMU_RU_Acc_y, Sig_IMU_RU_Acc_z],
               [Sig_IMU_LU_Acc_x, Sig_IMU_LU_Acc_y, Sig_IMU_LU_Acc_z],
-              [Sig_IMU_RL_Acc_x, Sig_IMU_RL_Acc_y, Sig_IMU_RL_Acc_z]]  # ankle x,y,z accelerometer
+              [Sig_IMU_RL_Acc_x, Sig_IMU_RL_Acc_y, Sig_IMU_RL_Acc_z]]  # back, right upper, left upper, right lower accelerometers
   y_column: ['labels']
   padding_val: [0.0]
   # 50==1sec ==> 3000==60sec==1min
@@ -54,7 +54,7 @@ ALGORITHM: DownstreamMLP
 # (all given as lists in case to perform a GridSearch)
 ALGORITHM_ARGS:
   epochs: [50]
-  batch_size: [1]
+  batch_size: [64]
   loss: [CrossEntropyLoss]
   optimizer: [Adam]
   weight_decay: [0.0]
@@ -73,7 +73,7 @@ ALGORITHM_ARGS:
   dim_prediction_head: [1028]  # Dim of hidden layers of MLP at end od model
 
 
-STORE_CMATS: True  # Store test cmats on disk
+STORE_CMATS: False  # Store test cmats on disk
 SKIP_FINISHED_ARGS: False
 
 # Metric which defines the best model
