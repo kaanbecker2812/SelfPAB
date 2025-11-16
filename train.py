@@ -203,6 +203,7 @@ def train(config, ds_path=None, loso=False):
                 #enable_progress_bar=False,
                 #check_val_every_n_epoch=check_val_every_n_epoch,
                 val_check_interval=0.5,
+                num_sanity_val_steps=0,
                 callbacks=callbacks
             )
             trainer.fit(model, train_dl, valid_dl)
