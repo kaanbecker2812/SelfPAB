@@ -19,7 +19,7 @@ VALID_SPLIT: 0.2
 # Randomly selected test subjects (Not used during LOSO!)
 TEST_SUBJECTS: null
 SEED: 28
-FOLDS: 5
+FOLDS: 0
 
 NUM_WORKERS: 8  # Num of workers for data loading
 NUM_GPUS: []  # How many GPUs to use
