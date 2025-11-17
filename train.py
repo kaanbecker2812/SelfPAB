@@ -295,7 +295,7 @@ def train(config, ds_path=None, loso=False, fold_num=None):
                     )
                 score = src.utils.get_score(cm, config.EVAL_METRIC)
                 if config.WANDB:# and not loso:
-                    wandb.log({f'Test_per_Fold_{"_".join(ds_args["x_columns"][0].split('_')[1:3])}_{config.EVAL_METRIC}': score})
+                    wandb.log({f'Test_per_Fold_{"_".join(ds_args["x_columns"][0].split("_")[1:3])}_{config.EVAL_METRIC}': score})
                 if best_score is None or score > best_score:
                     best_model = model
                     best_cmat = cm
