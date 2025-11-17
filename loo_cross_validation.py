@@ -108,8 +108,10 @@ def loso_cv(config, dataset_path=None, hopt=False):
             )
             best_model_path = os.path.join(f'{config.STORE_PATH}/models/',
                                            f'best_Fold_{test_files[0].split("_")[2]}_model.ckpt')
-            
-            torch.save(best_model.state_dict(), best_model_path)
+            os.makedirs(os.path.dirname(best_model_path), exist_ok=True)
+            # Save unwrapped model on CPU to avoid DDP/sharded tensor state_dict issues
+            _m = best_model.module if hasattr(best_model, "module") else best_model
+            torch.save(_m.cpu().state_dict(), best_model_path)
     final_CV_test_perf_mean = np.mean(fold_performances)
     final_CV_test_perf_std = np.std(fold_performances)
     print(f'Final {fold + 1}-fold CV {config.EVAL_METRIC}: {final_CV_test_perf_mean}({final_CV_test_perf_std})')
