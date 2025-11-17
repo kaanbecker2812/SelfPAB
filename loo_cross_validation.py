@@ -69,45 +69,50 @@ def loso_cv(config, dataset_path=None, hopt=False):
         config.TEST_SUBJECTS = test_files
         print(f'No. of train subjects: {len(train_files)}')
         print(f'Test subject: {test_files[0].split("_")[2]}; No. of test subjects: {len(test_files)}')
-        _,test_cmat,best_logs,best_args = train.train(config,dataset_path,loso=True, fold_idx=fold)
         if config.WANDB:
-            #for test_filename in test_cmat.keys():
+            config.WANDB_GROUP = f'fold_{fold + 1}'
+        best_model,test_cmat,best_logs,best_args = train.train(config,dataset_path,loso=True, fold_num=fold + 1)
+        if config.WANDB:
             src.utils.log_cmat_metrics_to_wandb(
-                log_cmat=test_cmat,#[test_filename],
-                log_name= f'Fold_{test_files[0].split("_")[2]}', #test_filename,
+                log_cmat=test_cmat,
+                log_name= f'per_Fold',
                 class_names=config.class_names,
                 metrics=['average_f1score',
                             'average_recall',
                             'average_precision',
-                            'accuracy',
-                            'cmat',
+                            'accuracy'
                         ])
+            src.utils.log_cmat_metrics_to_wandb(
+                log_cmat=test_cmat,#[test_filename],
+                log_name= f'Fold_{fold+1}',
+                class_names=config.class_names,
+                metrics=['cmat'])
             src.utils.log_history_metrics_to_wandb(
                     metrics_dict=best_logs,
-                    log_name=f'Fold_{test_files[0].split("_")[2]}'#test_filename,
+                    log_name=f'best_Fold_{test_files[0].split("_")[2]}'#test_filename,
                 )
             all_test_true += list(test_cmat.y_true)#[test_filename].y_true)
             all_test_pred += list(test_cmat.y_pred)#[test_filename].y_pred)
         #fold_performances.append(np.mean([getattr(_c, config.EVAL_METRIC) for _c in test_cmat.values()]))
         fold_performances.append(getattr(test_cmat, config.EVAL_METRIC))
         if config.STORE_CMATS:
-            to_store_path = f'{config.CONFIG_PATH}/loso_cmats/' if config.FOLDS==0 \
-                       else f'{config.CONFIG_PATH}/CV_folds{config.FOLDS}_cmats/'
+            to_store_path = f'{config.STORE_PATH}/reports/'
             if test_cmat is None:
                 breakpoint()
-            for test_filename in test_cmat.keys():
-                to_store_filename = test_filename.split('.')[-2] if '.' in test_filename \
-                                    else test_filename
-                src.utils.save_intermediate_cmat(
-                    path=to_store_path,
-                    filename=to_store_filename + '_cmat.pkl',
-                    args=best_args,
-                    cmats={test_filename: test_cmat[test_filename]},
-                    valid_subjects=[test_filename]
-                )
+            src.utils.save_intermediate_cmat(
+                path=to_store_path,
+                filename=f'best_Fold_{test_files[0].split("_")[2]}' + '_cmat.pkl',
+                args=best_args,
+                cmats={f'best_Fold_{test_files[0].split("_")[2]}': test_cmat},
+                valid_subjects=[fold + 1]
+            )
+            best_model_path = os.path.join(f'{config.STORE_PATH}/models/',
+                                           f'best_Fold_{test_files[0].split("_")[2]}_model.ckpt')
+            
+            torch.save(best_model.state_dict(), best_model_path)
     final_CV_test_perf_mean = np.mean(fold_performances)
     final_CV_test_perf_std = np.std(fold_performances)
-    print(f'Final {config.FOLDS}-fold CV {config.EVAL_METRIC}: {final_CV_test_perf_mean}({final_CV_test_perf_std})')
+    print(f'Final {fold + 1}-fold CV {config.EVAL_METRIC}: {final_CV_test_perf_mean}({final_CV_test_perf_std})')
     if hopt:
         tune.report(score_mean=final_CV_test_perf_mean,
                     score_std=final_CV_test_perf_std,

@@ -25,7 +25,7 @@ from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
 
-def train(config, ds_path=None, loso=False, fold_idx=None):
+def train(config, ds_path=None, loso=False, fold_num=None):
     """Starts model training with the given config and dataset path
 
     Parameters
@@ -51,7 +51,7 @@ def train(config, ds_path=None, loso=False, fold_idx=None):
     torch.backends.cudnn.deterministic = True
 
     ds_path = config.TRAIN_DATA if ds_path is None else ds_path
-    cmat_path = f'{config.CONFIG_PATH}/cmats/'
+    cmat_path = f'{config.CONFIG_PATH}/logs/'
     if config.VALID_SPLIT=='test':
         valid_subjects = config.TEST_SUBJECTS.copy()
         valid_split = 0.0
@@ -164,19 +164,24 @@ def train(config, ds_path=None, loso=False, fold_idx=None):
             # Stores all metrics in a dict
             history_logger = src.models.MetricsHistoryLogger()
             loggers = [history_logger]
-            if config.WANDB: # and not loso:
+            if config.WANDB and not loso:
                 proj_name = 'EASE_'+config.PROJ_NAME
-                group_name = f'Subject_fold_{fold_idx + 1}' if loso else None
-                run_name = "_".join(ds_args["x_columns"][0].split('_')[1:3])
-                wandb_logger = WandbLogger(project=proj_name,
-                                           group_name=group_name,
-                                           name=run_name)
+                group = config.WANDB_GROUP if loso else None
+                default_run_name = f'args_{current_iter:03d}_{"_".join(ds_args["x_columns"][0].split('_')[1:3])}'
+                run_name = getattr(config, 'WANDB_RUN_NAME', default_run_name)
+                wandb_logger = WandbLogger(
+                    project=proj_name,
+                    group=group,
+                    name=run_name,
+                    reinit=True
+                )
                 wandb_logger.watch(model, log_graph=False)
-                wandb.config.update(ds_args)
-                wandb.config.update(args)
+                wandb.config.update(ds_args, allow_val_change=True)
+                wandb.config.update(args, allow_val_change=True)
                 wandb.config.update({'Algorithm': config.ALGORITHM,
                                      'Dataset': config.DATASET,
-                                     'Train_DS_size': len(dataset)})
+                                     'Train_DS_size': len(dataset)},
+                                    allow_val_change=True)
                 loggers.append(wandb_logger)
             callbacks = []
             if config.EARLY_STOPPING:
@@ -196,7 +201,8 @@ def train(config, ds_path=None, loso=False, fold_idx=None):
                 val_check_interval=1.0,
                 num_sanity_val_steps=0,
                 callbacks=callbacks,
-                strategy=pl.strategies.DDPStrategy(broadcast_buffers=False) if len(config.NUM_GPUS)>1 else None
+                strategy=pl.strategies.DDPStrategy(broadcast_buffers=False) if len(config.NUM_GPUS)>1 else None,
+                enable_checkpointing=False
             )
             trainer.fit(model, train_dl, valid_dl)
             ######### Final Test of given args #########
@@ -282,15 +288,14 @@ def train(config, ds_path=None, loso=False, fold_idx=None):
                     )
                     src.utils.save_intermediate_cmat(
                         path=cmat_path,
-                        filename='args_'+str(current_iter).zfill(6)+'.pkl',
+                        filename=config.WANDB_GROUP+'_args_'+str(current_iter).zfill(6)+'.pkl',
                         args=cmat_args,
                         cmats=cm_cp,
                         valid_subjects=config.TEST_SUBJECTS
                     )
                 score = src.utils.get_score(cm, config.EVAL_METRIC)
-                if config.WANDB and not loso:
-                    wandb.log({f'Test_{config.EVAL_METRIC}': score})
-                    wandb.finish()
+                if config.WANDB:# and not loso:
+                    wandb.log({f'Test_per_Fold_{"_".join(ds_args["x_columns"][0].split('_')[1:3])}_{config.EVAL_METRIC}': score})
                 if best_score is None or score > best_score:
                     best_model = model
                     best_cmat = cm
