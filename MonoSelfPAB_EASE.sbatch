@@ -29,7 +29,7 @@ python -V || { echo 'Python in venv not working'; exit 1; }
 nvidia-smi || true
 
 # ---------------- run the downstream evaluation ----------------
-echo "Launching downstream_task_evaluation.py ..."
+echo "Launching loo_cross_validation.py ..."
 python loo_cross_validation.py \
   -p params/MonoSelfPAB_downstream_experiments/MonoSelfPAB_downstream_EASE/config.yml \
   -d "$DATA"
