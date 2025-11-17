@@ -84,11 +84,12 @@ def loso_cv(config, dataset_path=None, hopt=False):
                         ])
             src.utils.log_history_metrics_to_wandb(
                     metrics_dict=best_logs,
-                    log_name=test_filename,
+                    log_name=f'Fold_{test_files[0].split("_")[2]}'#test_filename,
                 )
             all_test_true += list(test_cmat.y_true)#[test_filename].y_true)
             all_test_pred += list(test_cmat.y_pred)#[test_filename].y_pred)
-        fold_performances.append(np.mean([getattr(_c, config.EVAL_METRIC) for _c in test_cmat.values()]))
+        #fold_performances.append(np.mean([getattr(_c, config.EVAL_METRIC) for _c in test_cmat.values()]))
+        fold_performances.append(getattr(test_cmat, config.EVAL_METRIC))
         if config.STORE_CMATS:
             to_store_path = f'{config.CONFIG_PATH}/loso_cmats/' if config.FOLDS==0 \
                        else f'{config.CONFIG_PATH}/CV_folds{config.FOLDS}_cmats/'
