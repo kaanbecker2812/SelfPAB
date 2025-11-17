@@ -32,7 +32,7 @@ ulimit -n 4096  # increase if you run into "Too many open files" errors
 
 # ---------------- run the downstream evaluation ----------------
 echo "Launching loo_cross_validation.py ..."
-python loo_cross_validation.py \
+srun python loo_cross_validation.py \
   -p params/MonoSelfPAB_downstream_experiments/MonoSelfPAB_downstream_EASE/config.yml \
   -d "$DATA"
 

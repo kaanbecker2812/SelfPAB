@@ -193,11 +193,17 @@ def train(config, ds_path=None, loso=False):
                 val_check_interval=1.0,
                 num_sanity_val_steps=0,
                 callbacks=callbacks,
-                strategy=pl.strategies.DDPStrategy(broadcast_buffers=False)
+                strategy=pl.strategies.DDPStrategy(broadcast_buffers=False) if len(config.NUM_GPUS)>1 else None
             )
-            trainer.fit(model, train_dl, valid_dl)
+            #trainer.fit(model, train_dl, valid_dl)
             ######### Final Test of given args #########
-            if len(config.TEST_SUBJECTS) != 0:
+            if len(config.TEST_SUBJECTS) != 0 and trainer.global_rank==0:
+                single_trainer = pl.Trainer(
+                    accelerator='gpu' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu',
+                    devices=1,
+                    logger=None,
+                    strategy=None
+                )
                 # Skip the train subjects
                 skip_files = [x for x in os.listdir(ds_path) \
                               if x not in config.TEST_SUBJECTS]
@@ -224,7 +230,7 @@ def train(config, ds_path=None, loso=False):
                     shuffle=False,
                     num_workers=config.NUM_WORKERS
                 )
-                y_hat = trainer.predict(model, test_dl)
+                y_hat = single_trainer.predict(model, test_dl)
                 try:
                     y_hat = torch.cat(y_hat)  # Stack batches
                 except RuntimeError as e:

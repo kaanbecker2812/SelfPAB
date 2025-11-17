@@ -777,9 +777,13 @@ class STFTDataset(HARDataset):
         t_dict = {}
         for filename, _range in self.data_ranges.items():
             try:
-                _t = t[_range].numpy()
+                # Clamp range to available predictions to avoid OOB when fewer
+                # windows were predicted than expected.
+                _end = min(_range.stop, len(t))
+                _t = t[_range.start:_end].numpy()
             except TypeError:
-                _t = np.array(t[slice(_range.start,_range.stop)][0])
+                _end = min(_range.stop, len(t[0]))
+                _t = np.array(t[slice(_range.start,_end)][0])
             # Split to spectrograms dim
             if _t.shape[0] != 1:
                 _t = unfold_windows(
