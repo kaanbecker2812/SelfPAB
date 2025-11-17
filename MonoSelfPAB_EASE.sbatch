@@ -28,6 +28,8 @@ source "$VENV_DIR/bin/activate"
 python -V || { echo 'Python in venv not working'; exit 1; }
 nvidia-smi || true
 
+ulimit -n 4096  # increase if you run into "Too many open files" errors
+
 # ---------------- run the downstream evaluation ----------------
 echo "Launching loo_cross_validation.py ..."
 python loo_cross_validation.py \
