@@ -167,7 +167,7 @@ def train(config, ds_path=None, loso=False, fold_num=None):
             if config.WANDB and not loso:
                 proj_name = 'EASE_'+config.PROJ_NAME
                 group = config.WANDB_GROUP if loso else None
-                default_run_name = f'args_{current_iter:03d}_{"_".join(ds_args["x_columns"][0].split('_')[1:3])}'
+                default_run_name = f'args_{current_iter:03d}_{"_".join(ds_args["x_columns"][0].split("_")[1:3])}'
                 run_name = getattr(config, 'WANDB_RUN_NAME', default_run_name)
                 wandb_logger = WandbLogger(
                     project=proj_name,
