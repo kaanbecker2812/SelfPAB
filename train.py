@@ -192,7 +192,8 @@ def train(config, ds_path=None, loso=False):
                 max_epochs=args['epochs'],
                 val_check_interval=1.0,
                 num_sanity_val_steps=0,
-                callbacks=callbacks
+                callbacks=callbacks,
+                strategy=pl.strategies.DDPStrategy(broadcast_buffers=False)
             )
             trainer.fit(model, train_dl, valid_dl)
             ######### Final Test of given args #########
