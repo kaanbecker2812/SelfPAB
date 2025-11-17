@@ -54,7 +54,7 @@ ALGORITHM: DownstreamMLP
 # (all given as lists in case to perform a GridSearch)
 ALGORITHM_ARGS:
   epochs: [50]
-  batch_size: [64]
+  batch_size: [16]
   loss: [CrossEntropyLoss]
   optimizer: [Adam]
   weight_decay: [0.0]
@@ -73,7 +73,8 @@ ALGORITHM_ARGS:
   dim_prediction_head: [1028]  # Dim of hidden layers of MLP at end od model
 
 
-STORE_CMATS: False  # Store test cmats on disk
+STORE_CMATS: True  # Store test cmats on disk
+STORE_PATH: "/dss/dsshome1/06/ge38qav/Pretrained_Models/experiments_selfPAB/reports" #'/Users/kaanbecker/Documents/VSCode/EASE_pretrained_models/SelfPAB/params/MonoSelfPAB_downstream_experiments/MonoSelfPAB_downstream_EASE'
 SKIP_FINISHED_ARGS: False
 
 # Metric which defines the best model

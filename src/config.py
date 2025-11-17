@@ -36,6 +36,7 @@ class Config(dict):
         self.TEST_SUBJECTS = cfg['TEST_SUBJECTS']
         self.EVAL_METRIC = cfg['EVAL_METRIC']
         self.STORE_CMATS = cfg['STORE_CMATS']
+        self.STORE_PATH = cfg['STORE_PATH'] if 'STORE_PATH' in cfg else ''
         self.SKIP_FINISHED_ARGS = cfg['SKIP_FINISHED_ARGS']
         self.SEED = cfg['SEED']
         self.NUM_WORKERS = cfg['NUM_WORKERS']
