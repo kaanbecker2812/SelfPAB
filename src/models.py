@@ -894,7 +894,7 @@ class AbsolutePositionalEncoding(torch.nn.Module):
         pe[:, 0, 1::2] = torch.cos(position * div_term)
         if batch_first:
             pe = einops.rearrange(pe,'S B D -> B S D')
-        self.register_buffer('pe', pe)
+        self.register_buffer('pe', pe.clone())
         self.batch_first = batch_first
 
     def forward(self, x):
