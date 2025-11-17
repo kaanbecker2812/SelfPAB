@@ -48,6 +48,7 @@ class Config(dict):
         self.PROJ_NAME = cfg['PROJ_NAME'] if 'PROJ_NAME' in cfg else ''
         self.WANDB = cfg['WANDB']
         self.WANDB_KEY = cfg['WANDB_KEY'] if 'WANDB_KEY' in cfg else ''
+        self.WANDB_GROUP = cfg['WANDB_GROUP'] if 'WANDB_GROUP' in cfg else ''
         self.ADDITIONAL_EVAL_METRICS = cfg['ADDITIONAL_EVAL_METRICS'] if \
                 'ADDITIONAL_EVAL_METRICS' in cfg else []
         self.METRIC_AGGR_WINDOW_LEN = cfg['METRIC_AGGR_WINDOW_LEN'] if \
