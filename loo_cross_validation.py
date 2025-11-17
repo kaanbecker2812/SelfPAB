@@ -69,7 +69,7 @@ def loso_cv(config, dataset_path=None, hopt=False):
         config.TEST_SUBJECTS = test_files
         print(f'No. of train subjects: {len(train_files)}')
         print(f'Test subject: {test_files[0].split("_")[2]}; No. of test subjects: {len(test_files)}')
-        _,test_cmat,best_logs,best_args = train.train(config,dataset_path,loso=True)
+        _,test_cmat,best_logs,best_args = train.train(config,dataset_path,loso=True, fold_idx=fold)
         if config.WANDB:
             #for test_filename in test_cmat.keys():
             src.utils.log_cmat_metrics_to_wandb(

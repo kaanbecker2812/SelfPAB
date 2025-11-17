@@ -25,7 +25,7 @@ from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
 
-def train(config, ds_path=None, loso=False):
+def train(config, ds_path=None, loso=False, fold_idx=None):
     """Starts model training with the given config and dataset path
 
     Parameters
@@ -164,10 +164,13 @@ def train(config, ds_path=None, loso=False):
             # Stores all metrics in a dict
             history_logger = src.models.MetricsHistoryLogger()
             loggers = [history_logger]
-            if config.WANDB and not loso:
-                ds_name = os.path.realpath(ds_path).split('/')[-1]
+            if config.WANDB: # and not loso:
                 proj_name = 'EASE_'+config.PROJ_NAME
-                wandb_logger = WandbLogger(project=proj_name)
+                group_name = f'Subject_fold_{fold_idx + 1}' if loso else None
+                run_name = f'{"_".join(ds_args["x_columns"][0].split('_')[1:3])}'
+                wandb_logger = WandbLogger(project=proj_name,
+                                           group_name=group_name,
+                                           name=run_name)
                 wandb_logger.watch(model, log_graph=False)
                 wandb.config.update(ds_args)
                 wandb.config.update(args)
@@ -195,7 +198,7 @@ def train(config, ds_path=None, loso=False):
                 callbacks=callbacks,
                 strategy=pl.strategies.DDPStrategy(broadcast_buffers=False) if len(config.NUM_GPUS)>1 else None
             )
-            #trainer.fit(model, train_dl, valid_dl)
+            trainer.fit(model, train_dl, valid_dl)
             ######### Final Test of given args #########
             if len(config.TEST_SUBJECTS) != 0 and trainer.global_rank==0:
                 single_trainer = pl.Trainer(
