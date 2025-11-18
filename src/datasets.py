@@ -672,8 +672,8 @@ class STFTDataset(HARDataset):
                     pad=[0,0,0,overflow],
                     value=self.padding_val
                 )
-                if self.unstack_sensors:
-                    x = self._unstack_sensors(x)
+                #if self.unstack_sensors:
+                    #x = self._unstack_sensors(x)
                 if self.ts_data:
                     x_ts = self._pad_timestamps(x_ts, overflow)
                     x_ts = src.utils.timestamps_to_tensor(x_ts)
@@ -685,8 +685,8 @@ class STFTDataset(HARDataset):
             return x
         else:
             y = self.data[fn][1][start_idx:end_idx]
-            if self.unstack_sensors:
-                x = self._unstack_sensors(x)
+            #if self.unstack_sensors:
+                #x = self._unstack_sensors(x)
             if self.ts_data:
                 x_ts = src.utils.timestamps_to_tensor(x_ts)
                 x = (x, x_ts)
@@ -881,9 +881,12 @@ class STFTDataset(HARDataset):
             df = pd.read_csv(
                 os.path.join(root_path, fn),
                 sep=self.sep,
-                usecols=uc,
                 header=self.header,
             )
+            available_cols = df.columns.tolist()
+            missing_cols = [col for col in uc if col not in available_cols]
+            df[missing_cols] = 0.0
+            df = df[uc]
             for drop_label in self.drop_labels:
                 df = df[df[self.y_column]!=drop_label]
             df = df.dropna()  # Drop nan values
@@ -914,6 +917,11 @@ class STFTDataset(HARDataset):
             # reshape required for correct STFT computation:
             # [signal_len, num_channels] -> [num_channels, signal_len]
             x = einops.rearrange(x, 'S C -> C S')
+            # reshape x to (num_IMUS, 3, signal_len) if required
+            if self.unstack_sensors:
+                self.num_sensors = len(self.x_columns)//3
+                x = einops.rearrange(x,'(N C) S -> N C S', N=self.num_sensors, C=3)
+            
             if self.inference_mode:
                 # Padding to make STFT computation easier
                 overflow = np.floor((x.shape[-1]-1)/self.hop_length)
@@ -924,16 +932,34 @@ class STFTDataset(HARDataset):
                     pad=[0,overflow],
                     value=self.padding_val
                 )
-            x = meter_per_sec_squared2g(x)
-            x = torch.stft(
-                input=x,
-                n_fft=self.n_fft,
-                hop_length=self.hop_length,
-                win_length=self.n_fft,
-                window=self.window,
-                center=False,
-                return_complex=True
-            )  # [num_channels, num_bins, num_frames]
+            if self.unstack_sensors:
+                # Compute STFT for each sensor and stack channels again
+                stft_list = []
+                for sensor_idx in range(x.shape[0]):
+                    sensor_x = x[sensor_idx]  # [3, signal_len]
+                    sensor_stft = torch.stft(
+                        input=sensor_x,
+                        n_fft=self.n_fft,
+                        hop_length=self.hop_length,
+                        win_length=self.n_fft,
+                        window=self.window,
+                        center=False,
+                        return_complex=True
+                    )  # [3, num_bins, num_frames]
+                    stft_list.append(sensor_stft)
+                x = torch.cat(stft_list, dim=0)  # [num_channels, num_bins, num_frames]
+            # Else compute STFT normally
+            else:
+                x = meter_per_sec_squared2g(x)
+                x = torch.stft(
+                    input=x,
+                    n_fft=self.n_fft,
+                    hop_length=self.hop_length,
+                    win_length=self.n_fft,
+                    window=self.window,
+                    center=False,
+                    return_complex=True
+                )  # [num_channels, num_bins, num_frames]
             x_cartesian = src.utils.complex_to_cartesian(x)
             x_magnitude = src.utils.complex_to_magnitude(x, expand=True)
             x = x_cartesian if self.phase else x_magnitude
@@ -944,6 +970,7 @@ class STFTDataset(HARDataset):
                 x = einops.rearrange(x, 'C F T P -> T (C F P)')  # P=2
             else:
                 x = einops.rearrange(x, 'C F T P -> T C F P')
+            
             if self._label_cols_available:
                 y = windowed_labels(
                     labels=df[self.y_column].values,
@@ -1002,7 +1029,16 @@ class STFTDataset(HARDataset):
     def normalize_data(self):
         '''Normalize time signals'''
         for fn, (x,y) in self.data.items():
-            x = normalize(x=x, mean=self.mean, std=self.std)
+            
+            if self.unstack_sensors:
+                dim_per_sensor = x.size(1) / self.num_sensors  
+                x_new = []
+                for i in range(self.num_sensors):
+                    x_new.append(normalize(x=x[:,int(i*dim_per_sensor):int((i+1)*dim_per_sensor)], mean=self.mean, std=self.std))
+                    
+                x = torch.cat(x_new, dim=1)
+            else:
+                x = normalize(x=x, mean=self.mean, std=self.std)
             self.data[fn] = (x,y)
 
     # @cached

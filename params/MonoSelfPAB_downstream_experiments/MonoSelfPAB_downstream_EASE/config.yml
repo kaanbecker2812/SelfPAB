@@ -29,23 +29,26 @@ PROJ_NAME: 'MonoSelfPAB_downstream'
 
 DATASET: STFT
 DATASET_ARGS:
-  x_columns: [[Sig_IMU_Back_Acc_x, Sig_IMU_Back_Acc_y, Sig_IMU_Back_Acc_z],
-              [Sig_IMU_RU_Acc_x, Sig_IMU_RU_Acc_y, Sig_IMU_RU_Acc_z],
-              [Sig_IMU_LU_Acc_x, Sig_IMU_LU_Acc_y, Sig_IMU_LU_Acc_z],
-              [Sig_IMU_RL_Acc_x, Sig_IMU_RL_Acc_y, Sig_IMU_RL_Acc_z]]  # back, right upper, left upper, right lower accelerometers
+  x_columns: [[Sig_IMU_Back_Acc_x, Sig_IMU_Back_Acc_y, Sig_IMU_Back_Acc_z,
+              Sig_IMU_RU_Acc_x, Sig_IMU_RU_Acc_y, Sig_IMU_RU_Acc_z,
+              Sig_IMU_LU_Acc_x, Sig_IMU_LU_Acc_y, Sig_IMU_LU_Acc_z,
+              Sig_IMU_RL_Acc_x, Sig_IMU_RL_Acc_y, Sig_IMU_RL_Acc_z,
+              Sig_IMU_LL_Acc_x, Sig_IMU_LL_Acc_y, Sig_IMU_LL_Acc_z]]  # back, right upper, left upper, right lower accelerometers
   y_column: ['labels']
   padding_val: [0.0]
   # 50==1sec ==> 3000==60sec==1min
-  sequence_length: [50]  # Window size (in samples) fed into the model
-  frame_shift: [25]  # How much to shift a window (in samples) null=same as sequence_length
+  sequence_length: [120]  # Window size (in samples) fed into the model
+  frame_shift: [90]  # How much to shift a window (in samples) null=same as sequence_length
   normalize: [True]  # Whether to normalize the training data
   norm_params_path: [params/norm_params/HUNT4_T/normalization_params_STFT_feats78_seqlen599/]
   n_fft: [50]  # Size of Fourier transform (in samples)
   phase: [False]
   hop_length: [null]  # For STFT computation. If None, n_fft//2
   source_freq: [1000]  # Sampling frequency of dataset
-  target_freq: [50]  # Sampling frequency to use for training
+  target_freq: [1000]  # Sampling frequency to use for training
   reorientation: [True]  # Reorient axes to be closer to HUNT4 orientation
+  unstack_sensors: [True]  # Whether to unstack sensors along feature dimension (True) or stack along time dimension (False)
+  #subsample_perc: [4]
 
 # -- Model 
 # Which classifier to use 
@@ -54,7 +57,7 @@ ALGORITHM: DownstreamMLP
 # (all given as lists in case to perform a GridSearch)
 ALGORITHM_ARGS:
   epochs: [50]
-  batch_size: [32]
+  batch_size: [128]
   loss: [CrossEntropyLoss]
   optimizer: [Adam]
   weight_decay: [0.0]
@@ -71,6 +74,8 @@ ALGORITHM_ARGS:
   dropout: [0.1]  # Dropout probability
   n_prediction_head_layers: [2]  # Num layers of MLP at end of model
   dim_prediction_head: [1028]  # Dim of hidden layers of MLP at end od model
+  upstream_branches: [5]
+  branch_merge_operation: [concat]
 
 
 STORE_CMATS: True  # Store test cmats on disk

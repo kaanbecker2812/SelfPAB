@@ -151,7 +151,7 @@ def train(config, ds_path=None, loso=False, fold_num=None):
             )
             _epochs = args['epochs']
             total_step_count = len(train_dl)*_epochs
-            args.update({'input_dim': dataset.feature_dim,
+            args.update({'input_dim': dataset.feature_dim * dataset.num_sensors,
                          'output_dim': dataset.output_shapes,
                          'total_step_count': total_step_count,
                          'sequence_length': ds_args['sequence_length']})
