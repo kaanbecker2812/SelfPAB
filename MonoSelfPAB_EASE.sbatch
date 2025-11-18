@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -J ease_selfPAB
 #SBATCH -p lrz-dgx-1-p100x8          # adjust to your GPU partition
-#SBATCH --gres=gpu:4
+#SBATCH --gres=gpu:3
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G                     # 64G is usually enough; raise if needed
 #SBATCH -t 20:00:00

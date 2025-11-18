@@ -22,7 +22,7 @@ SEED: 28
 FOLDS: 0
 
 NUM_WORKERS: 12  # Num of workers for data loading
-NUM_GPUS: [0, 1, 2, 3]  # How many GPUs to use
+NUM_GPUS: [0, 1, 2]  # How many GPUs to use
 WANDB: True
 WANDB_KEY: '6e4c1240ab75e6cd5108325b3f17d887be6ebfa9'
 PROJ_NAME: 'MonoSelfPAB_downstream'
