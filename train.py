@@ -302,6 +302,16 @@ def train(config, ds_path=None, loso=False, fold_num=None):
                     best_score = score
                     best_logs = history_logger.history
                     best_args = cmat_args
+                    if trainer.global_rank == 0:
+                        try:
+                            best_model_path = os.path.join(f'{config.STORE_PATH}/models/',
+                                                        f'best_{config.WANDB_GROUP}_model.ckpt')
+                            os.makedirs(os.path.dirname(best_model_path), exist_ok=True)
+                            # use Lightning to unwrap DDP before saving
+                            trainer.strategy.save_checkpoint(best_model_path)
+                        except Exception as e:
+                            print(f"Failed to save checkpoint: {e}")
+
             current_iter += 1
     print(f'Best score: {best_score}, with best args: {best_args}')
     return best_model, best_cmat, best_logs, best_args

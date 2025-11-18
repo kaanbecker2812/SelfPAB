@@ -74,7 +74,7 @@ ALGORITHM_ARGS:
 
 
 STORE_CMATS: True  # Store test cmats on disk
-STORE_PATH: "/dss/dsshome1/06/ge38qav/Pretrained_Models/experiments_selfPAB/reports" #'/Users/kaanbecker/Documents/VSCode/EASE_pretrained_models/SelfPAB/params/MonoSelfPAB_downstream_experiments/MonoSelfPAB_downstream_EASE'
+STORE_PATH: "/dss/dsshome1/06/ge38qav/Pretrained_Models/experiments_selfPAB/exp_1" #'/Users/kaanbecker/Documents/VSCode/EASE_pretrained_models/SelfPAB/params/MonoSelfPAB_downstream_experiments/MonoSelfPAB_downstream_EASE'
 SKIP_FINISHED_ARGS: False
 
 # Metric which defines the best model
