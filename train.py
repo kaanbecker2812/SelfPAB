@@ -51,7 +51,7 @@ def train(config, ds_path=None, loso=False, fold_num=None):
     torch.backends.cudnn.deterministic = True
 
     ds_path = config.TRAIN_DATA if ds_path is None else ds_path
-    cmat_path = f'{config.CONFIG_PATH}/logs/'
+    cmat_path = f'{config.STORE_PATH}/logs/'
     if config.VALID_SPLIT=='test':
         valid_subjects = config.TEST_SUBJECTS.copy()
         valid_split = 0.0
@@ -295,7 +295,7 @@ def train(config, ds_path=None, loso=False, fold_num=None):
                     )
                 score = src.utils.get_score(cm, config.EVAL_METRIC)
                 if config.WANDB:# and not loso:
-                    wandb.log({f'Test_per_Fold_{"_".join(ds_args["x_columns"][0].split("_")[1:3])}_{config.EVAL_METRIC}': score})
+                    wandb.log({f'Test_per_Fold_per_args_{config.EVAL_METRIC}': score})
                 if best_score is None or score > best_score:
                     best_model = model
                     best_cmat = cm

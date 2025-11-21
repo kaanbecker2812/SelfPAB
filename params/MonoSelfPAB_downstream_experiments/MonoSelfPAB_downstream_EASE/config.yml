@@ -37,15 +37,15 @@ DATASET_ARGS:
   y_column: ['labels']
   padding_val: [0.0]
   # 50==1sec ==> 3000==60sec==1min
-  sequence_length: [120]  # Window size (in samples) fed into the model
-  frame_shift: [90]  # How much to shift a window (in samples) null=same as sequence_length
+  sequence_length: [100]  # Window size (in samples) fed into the model
+  frame_shift: [50]  # How much to shift a window (in samples) null=same as sequence_length
   normalize: [True]  # Whether to normalize the training data
   norm_params_path: [params/norm_params/HUNT4_T/normalization_params_STFT_feats78_seqlen599/]
   n_fft: [50]  # Size of Fourier transform (in samples)
   phase: [False]
   hop_length: [null]  # For STFT computation. If None, n_fft//2
   source_freq: [1000]  # Sampling frequency of dataset
-  target_freq: [1000]  # Sampling frequency to use for training
+  target_freq: [1000, 100]  # Sampling frequency to use for training
   reorientation: [True]  # Reorient axes to be closer to HUNT4 orientation
   unstack_sensors: [True]  # Whether to unstack sensors along feature dimension (True) or stack along time dimension (False)
   #subsample_perc: [4]
@@ -70,16 +70,16 @@ ALGORITHM_ARGS:
   upstream_model_path: [params/MonoSelfPAB_upstream/upstream_model.ckpt]
   rmv_upstream_layers: [4]  # remove the last 4 layers: 3metrics+1pred heads
   weighted_sum_layer: [null]  # None=no weighted sum
-  fine_tune_step: [0.75]  # when start fine tune in %
+  fine_tune_step: [0.4]  # when start fine tune in %
   dropout: [0.1]  # Dropout probability
-  n_prediction_head_layers: [2]  # Num layers of MLP at end of model
+  n_prediction_head_layers: [3]  # Num layers of MLP at end of model
   dim_prediction_head: [1028]  # Dim of hidden layers of MLP at end od model
   upstream_branches: [5]
   branch_merge_operation: [concat]
 
 
 STORE_CMATS: True  # Store test cmats on disk
-STORE_PATH: "/dss/dsshome1/06/ge38qav/Pretrained_Models/experiments_selfPAB/exp_1" #'/Users/kaanbecker/Documents/VSCode/EASE_pretrained_models/SelfPAB/params/MonoSelfPAB_downstream_experiments/MonoSelfPAB_downstream_EASE'
+STORE_PATH: "/dss/dsshome1/06/ge38qav/Pretrained_Models/experiments_selfPAB/exp_2" 
 SKIP_FINISHED_ARGS: False
 
 # Metric which defines the best model

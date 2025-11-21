@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:3
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G                     # 64G is usually enough; raise if needed
-#SBATCH -t 20:00:00
+#SBATCH -t 14:00:00
 #SBATCH -o /dss/dsshome1/06/ge38qav/Pretrained_Models/slurm/%x_%j.out
 #SBATCH -e /dss/dsshome1/06/ge38qav/Pretrained_Models/slurm/%x_%j.err
 
