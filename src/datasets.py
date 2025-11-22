@@ -16,6 +16,9 @@ import zipfile
 import tempfile
 
 import sys
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 
 def cached(f):
@@ -937,6 +940,7 @@ class STFTDataset(HARDataset):
                 stft_list = []
                 for sensor_idx in range(x.shape[0]):
                     sensor_x = x[sensor_idx]  # [3, signal_len]
+                    sensor_x = meter_per_sec_squared2g(sensor_x)
                     sensor_stft = torch.stft(
                         input=sensor_x,
                         n_fft=self.n_fft,

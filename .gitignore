@@ -8,7 +8,7 @@ data/*
 .vscode/
 Metrics*/
 wandb/
-params/MonoSelfPAB_downstream_experiments/MonoSelfPAB_downstream_EASE/config_local.yml
+*local.yml
 logs/
 models/
 reports/

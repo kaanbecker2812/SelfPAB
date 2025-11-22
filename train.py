@@ -1,10 +1,7 @@
 import warnings
-warnings.filterwarnings(
-    "ignore",
-    message="pkg_resources is deprecated as an API.*",
-    category=UserWarning,
-    module="torchmetrics.utilities.imports",
-)
+warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
+
 
 import os
 import cmat
@@ -23,6 +20,7 @@ import pytorch_lightning as pl
 import wandb
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
+import time
 
 
 def train(config, ds_path=None, loso=False, fold_num=None):
@@ -204,7 +202,9 @@ def train(config, ds_path=None, loso=False, fold_num=None):
                 strategy=pl.strategies.DDPStrategy(broadcast_buffers=False) if len(config.NUM_GPUS)>1 else None,
                 enable_checkpointing=False
             )
+            t0 = time.time()
             trainer.fit(model, train_dl, valid_dl)
+            print(f'Training time for current args: {(time.time()-t0):.2f} seconds')
             ######### Final Test of given args #########
             if len(config.TEST_SUBJECTS) != 0 and trainer.global_rank==0:
                 single_trainer = pl.Trainer(

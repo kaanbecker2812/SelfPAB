@@ -1,10 +1,6 @@
 import warnings
-warnings.filterwarnings(
-    "ignore",
-    message="pkg_resources is deprecated as an API.*",
-    category=UserWarning,
-    module="torchmetrics.utilities.imports",
-)
+warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 import os
 import argparse
