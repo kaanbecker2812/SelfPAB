@@ -1034,7 +1034,7 @@ class STFTDataset(HARDataset):
         '''Normalize time signals'''
         for fn, (x,y) in self.data.items():
             
-            if self.unstack_sensors:
+            if self.unstack_sensors and self.mean.size(0) == x.size(1)//self.num_sensors:
                 dim_per_sensor = x.size(1) / self.num_sensors  
                 x_new = []
                 for i in range(self.num_sensors):

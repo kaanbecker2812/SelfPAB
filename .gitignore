@@ -12,3 +12,4 @@ wandb/
 logs/
 models/
 reports/
+params/norm_params/EASE/*
