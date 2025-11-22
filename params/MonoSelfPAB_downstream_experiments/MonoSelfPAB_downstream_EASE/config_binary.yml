@@ -5,10 +5,10 @@ TRAIN_COMMAND: [ python, train.py ]
 LOO_CV_COMMAND: [python, loo_cross_validation.py]
 
 CLASSES:
-  - { label: 0,  name: 'idle',                              }
-  - { label: 1,  name: 'lifting',                           }
-  - { label: 2,  name: 'lowering',                          }
-  - { label: 3,  name: 'carrying',                          }
+  - { label: 0,  name: 'idle/carrying',                          }  
+  - { label: 1,  name: 'lifting/lowering',                          }
+  - { label: 2,  name: 'lowering', replace: 1                          }
+  - { label: 3,  name: 'carrying', replace: 0                          }
 
 # --- Information about data
 # Path to training dataset 
@@ -21,7 +21,7 @@ TEST_SUBJECTS: null
 SEED: 28
 FOLDS: 0
 
-NUM_WORKERS: 12  # Num of workers for data loading
+NUM_WORKERS: 16  # Num of workers for data loading
 NUM_GPUS: [0, 1, 2]  # How many GPUs to use
 WANDB: True
 WANDB_KEY: '6e4c1240ab75e6cd5108325b3f17d887be6ebfa9'
@@ -79,7 +79,7 @@ ALGORITHM_ARGS:
 
 
 STORE_CMATS: True  # Store test cmats on disk
-STORE_PATH: "/dss/dsshome1/06/ge38qav/Pretrained_Models/experiments_selfPAB/exp_3" 
+STORE_PATH: "/dss/dsshome1/06/ge38qav/Pretrained_Models/experiments_selfPAB/exp_1_binary" 
 SKIP_FINISHED_ARGS: False
 
 # Metric which defines the best model
