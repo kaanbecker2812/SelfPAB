@@ -37,7 +37,7 @@ DATASET_ARGS:
   y_column: ['labels']
   padding_val: [0.0]
   # 50==1sec ==> 3000==60sec==1min
-  sequence_length: [50, 100]  # Window size (in samples) fed into the model
+  sequence_length: [100]  # Window size (in samples) fed into the model
   frame_shift: [50]  # How much to shift a window (in samples) null=same as sequence_length
   normalize: [True]  # Whether to normalize the training data
   norm_params_path: [params/norm_params/EASE/normalization_params_STFT_EASE_feats78/] #, params/norm_params/HUNT4_T/normalization_params_STFT_feats78_seqlen599/]
@@ -56,7 +56,7 @@ ALGORITHM: DownstreamMLP
 # Arguments for classifier
 # (all given as lists in case to perform a GridSearch)
 ALGORITHM_ARGS:
-  epochs: [50]
+  epochs: [70]
   batch_size: [64]
   loss: [CrossEntropyLoss]
   optimizer: [Adam]
