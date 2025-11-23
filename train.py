@@ -71,12 +71,6 @@ def train(config, ds_path=None, loso=False, fold_num=None):
         # Iterate over all model configs if given
         for args in src.utils.grid_search(config.ALGORITHM_ARGS):
             ######### Train with given args ##########
-            #print(f'Evaluating arguments: {args}', flush=True)
-            if config.SKIP_FINISHED_ARGS and \
-               src.utils.args_exist(args, ds_args, cmat_path):
-                print(f'Skipping existing args {current_iter}...')
-                current_iter += 1
-                continue
             # Create the dataset
             skip_files = config.TEST_SUBJECTS.copy()
             if valid_subjects:
@@ -276,7 +270,7 @@ def train(config, ds_path=None, loso=False, fold_num=None):
                 cmat_args.update(ds_args.copy())
                 cmat_args.update({'algorithm': config.ALGORITHM,
                                   'dataset': config.DATASET})
-                if config.STORE_CMATS:
+                """if config.STORE_CMATS:
                     cm_cp = src.utils.compute_cmat(
                         y_true = y_true,
                         y_pred = y_hat,
@@ -292,10 +286,16 @@ def train(config, ds_path=None, loso=False, fold_num=None):
                         args=cmat_args,
                         cmats=cm_cp,
                         valid_subjects=config.TEST_SUBJECTS
-                    )
+                    )"""
                 score = src.utils.get_score(cm, config.EVAL_METRIC)
                 if config.WANDB:# and not loso:
                     wandb.log({f'Test_per_Fold_per_args_{config.EVAL_METRIC}': score})
+                    prec_score = src.utils.get_score(cm, 'average_precision')
+                    recall_score = src.utils.get_score(cm, 'average_recall')
+                    accuracy_score = src.utils.get_score(cm, 'accuracy')
+                    wandb.log({f'Test_per_Fold_per_args_average_precision': prec_score})
+                    wandb.log({f'Test_per_Fold_per_args_average_recall': recall_score})
+                    wandb.log({f'Test_per_Fold_per_args_accuracy': accuracy_score})
                 if best_score is None or score > best_score:
                     best_model = model
                     best_cmat = cm

@@ -991,17 +991,6 @@ class STFTDataset(HARDataset):
                 data[fn] = (x, y)
             else:
                 data[fn] = (x, None)
-            if self.return_timestamps:
-                x_ts = windowed_timestamps(
-                    df[self.timestamp_column].values,
-                    frame_length=self.n_fft,
-                    frame_step=self.hop_length,
-                    pad_end=self.inference_mode,
-                    kind='center'
-                )
-                x_ts = [datetime.datetime.strptime(_ts[:26],'%Y-%m-%d %H:%M:%S.%f') \
-                        for _ts in x_ts]
-                self.ts_data[fn] = x_ts
         return data
 
     def _get_data_ranges(self):
