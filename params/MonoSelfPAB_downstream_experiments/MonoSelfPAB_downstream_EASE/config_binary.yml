@@ -8,7 +8,7 @@ CLASSES:
   - { label: 0,  name: 'idle/carrying',                          }  
   - { label: 1,  name: 'lifting/lowering',                          }
   - { label: 2,  name: 'lowering', replace: 1                          }
-  - { label: 3,  name: 'carrying', replace: 0                          }
+  - { label: 3,  name: 'carrying', replace: 1                          }
 
 # --- Information about data
 # Path to training dataset 

@@ -18,7 +18,7 @@ OUTDIR="$HOME/Pretrained_Models/experiments_selfPAB/exp_2_binary"
 
 DATA="$HOME/DATA/raw/labeled"                                      # folder with your X.npy/Y.npy/pid.npy
 
-mkdir -p "${OUTDIR}"/{models,logs,reports}
+mkdir -p "${OUTDIR}"/{models, reports}
 
 # Keep BLAS threads in check
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-8}
