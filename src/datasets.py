@@ -184,7 +184,7 @@ class HARDataset(torch.utils.data.Dataset):
         '''Is there a y_column in every given root file'''
         filenames = [x for x in os.listdir(self.root_path) \
                      if x not in self.skip_files and x.endswith('.csv')]
-        for fn in tqdm(filenames):
+        for fn in filenames:
             available_cols = pd.read_csv(
                 os.path.join(self.root_path, fn),
                 index_col=0,
@@ -880,7 +880,7 @@ class STFTDataset(HARDataset):
             self.ts_data = {}
         else:
             self.ts_data = None
-        for fn in tqdm(filenames):
+        for fn in filenames:
             df = pd.read_csv(
                 os.path.join(root_path, fn),
                 sep=self.sep,

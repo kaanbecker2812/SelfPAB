@@ -194,7 +194,8 @@ def train(config, ds_path=None, loso=False, fold_num=None):
                 num_sanity_val_steps=0,
                 callbacks=callbacks,
                 strategy=pl.strategies.DDPStrategy(broadcast_buffers=False) if len(config.NUM_GPUS)>1 else None,
-                enable_checkpointing=False
+                enable_checkpointing=False,
+                enable_progress_bar=False
             )
             t0 = time.time()
             trainer.fit(model, train_dl, valid_dl)
