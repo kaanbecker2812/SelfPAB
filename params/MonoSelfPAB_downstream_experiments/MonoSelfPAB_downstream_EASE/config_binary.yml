@@ -78,7 +78,7 @@ ALGORITHM_ARGS:
   branch_merge_operation: [concat]
 
 
-STORE_CMATS: True  # Store test cmats on disk
+STORE_CMATS: False  # Store test cmats on disk
 STORE_PATH: "/dss/dsshome1/06/ge38qav/Pretrained_Models/experiments_selfPAB/exp_2_binary" 
 SKIP_FINISHED_ARGS: False
 

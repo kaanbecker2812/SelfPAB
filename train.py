@@ -206,7 +206,9 @@ def train(config, ds_path=None, loso=False, fold_num=None):
                     accelerator='gpu' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu',
                     devices=1,
                     logger=None,
-                    strategy=None
+                    strategy=None,
+                    enable_checkpointing=False,
+                    enable_progress_bar=False
                 )
                 # Skip the train subjects
                 skip_files = [x for x in os.listdir(ds_path) \
