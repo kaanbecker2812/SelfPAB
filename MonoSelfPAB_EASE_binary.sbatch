@@ -14,7 +14,7 @@ echo "Node: $(hostname) | GPU(s): ${CUDA_VISIBLE_DEVICES:-N/A} | Start: $(date)"
 # ---------- Paths (edit these to your layout) ----------
 CODE="$HOME/Pretrained_Models/SelfPAB"           # cloned repo
 VENV_DIR="$HOME/.venvs/harnet"                              # venv location in HOME
-OUTDIR="$HOME/Pretrained_Models/experiments_selfPAB/exp_2_binary" 
+OUTDIR="$HOME/Pretrained_Models/experiments_selfPAB/exp_4_binary" 
 
 DATA="$HOME/DATA/raw/labeled"                                      # folder with your X.npy/Y.npy/pid.npy
 

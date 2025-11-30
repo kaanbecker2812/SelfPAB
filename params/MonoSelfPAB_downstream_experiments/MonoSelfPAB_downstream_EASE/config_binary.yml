@@ -79,7 +79,7 @@ ALGORITHM_ARGS:
 
 
 STORE_CMATS: False  # Store test cmats on disk
-STORE_PATH: "/dss/dsshome1/06/ge38qav/Pretrained_Models/experiments_selfPAB/exp_2_binary" 
+STORE_PATH: "/dss/dsshome1/06/ge38qav/Pretrained_Models/experiments_selfPAB/exp_4_binary" 
 SKIP_FINISHED_ARGS: False
 
 # Metric which defines the best model
