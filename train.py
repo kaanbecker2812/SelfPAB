@@ -292,13 +292,13 @@ def train(config, ds_path=None, loso=False, fold_num=None):
                     )"""
                 score = src.utils.get_score(cm, config.EVAL_METRIC)
                 if config.WANDB:# and not loso:
-                    wandb.log({f'Test_per_Fold_per_args_{config.EVAL_METRIC}': score})
+                    wandb.log({f'Test_per_Fold_{ds_args['target_freq']}Hz_{config.EVAL_METRIC}': score})
                     prec_score = src.utils.get_score(cm, 'average_precision')
                     recall_score = src.utils.get_score(cm, 'average_recall')
                     accuracy_score = src.utils.get_score(cm, 'accuracy')
-                    wandb.log({f'Test_per_Fold_per_args_average_precision': prec_score})
-                    wandb.log({f'Test_per_Fold_per_args_average_recall': recall_score})
-                    wandb.log({f'Test_per_Fold_per_args_accuracy': accuracy_score})
+                    wandb.log({f'Test_per_Fold_{ds_args['target_freq']}Hz_average_precision': prec_score})
+                    wandb.log({f'Test_per_Fold_{ds_args['target_freq']}Hz_average_recall': recall_score})
+                    wandb.log({f'Test_per_Fold_{ds_args['target_freq']}Hz_accuracy': accuracy_score})
                 if best_score is None or score > best_score:
                     best_model = model
                     best_cmat = cm
