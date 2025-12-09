@@ -40,7 +40,7 @@ DATASET_ARGS:
   sequence_length: [100]  # Window size (in samples) fed into the model
   frame_shift: [50]  # How much to shift a window (in samples) null=same as sequence_length
   normalize: [True]  # Whether to normalize the training data
-  norm_params_path: [] #[params/norm_params/EASE/normalization_params_STFT_EASE_feats78/] , params/norm_params/HUNT4_T/normalization_params_STFT_feats78_seqlen599/]
+  norm_params_path: [params/norm_params/EASE/normalization_params_STFT_EASE_feats78_2_sens/] #, params/norm_params/HUNT4_T/normalization_params_STFT_feats78_seqlen599/]
   n_fft: [50]  # Size of Fourier transform (in samples)
   phase: [False]
   hop_length: [null]  # For STFT computation. If None, n_fft//2
